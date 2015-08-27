@@ -1,0 +1,28 @@
+{
+  "sql-profile": "sqlite-jdbc-default",
+  "database":"printfeed",
+  "database-version":"1",
+  "error-profile":"default",
+  "classes": [
+    {
+      "name":"FeedItem",
+      "attributes":[
+        {"name":"title", "type":"string"},
+        {"name":"link", "type":"string"},
+        {"name":"desc", "type":"string"},
+        {"name":"srcId", "type":"int"},
+        {"name":"seen", "type":"bool"},
+        {"name":"date", "type":"date"}
+      ]
+    },
+    {
+      "name":"FeedSource",
+      "attributes":[
+        {"name":"name", "type":"string"},
+        {"name":"url", "type":"string"},
+        {"name":"tags", "type":"string"}
+        ]
+    }
+  ]
+
+}
