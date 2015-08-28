@@ -1,8 +1,9 @@
 {
-  "sql-profile": "sqlite-jdbc-default",
+  "output-profile": "sqlite_jdbc",
   "database":"printfeed",
   "database-version":"1",
   "error-profile":"default",
+  "root-package":"com.printfeed",
   "classes": [
     {
       "name":"FeedItem",
