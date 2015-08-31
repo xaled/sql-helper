@@ -58,9 +58,9 @@ public class ${helperclassname}  {
     private static final String TABLE_${c['name']|upper} = "${c['name']|lower}";
 % endfor
 
+    private static final String KEY_ID = "id";
 % for c in classes:
     // ${c['name']} Table Columns titles
-    private static final String KEY_ID = "id";
    % for v in c['vars']:
     private static final String KEY_${v['name']|upper} = "${v['name']|lower}";
    % endfor
@@ -139,7 +139,7 @@ public class ${helperclassname}  {
     % endfor
             stmt.executeUpdate(sql);
             stmt.close();
-            c.commit();
+            connection.commit();
         } catch (SQLException e) {
 			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
 		}
@@ -178,12 +178,12 @@ public class ${helperclassname}  {
 % for c in classes:
     // Getting All ${c['name']}
     public List<${c['name']|upperFirst}> getAll${c['name']|upperFirst}s() {
+        ArrayList<${c['name']|upperFirst}> list = new ArrayList<${c['name']|upperFirst}>();
         try{
 
             String sql = "SELECT * FROM TABLE_${c['name']|upper}";
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
-            ArrayList<${c['name']|upperFirst}> list = newArray List<${c['name']|upperFirst}>();
             while( rs.next() ) {
                 ${c['name']|upperFirst} ${c['name']|lower}_ = new ${c['name']|upperFirst}();
                 ${c['name']|lower}_.setId(rs.getLong("id"));
@@ -237,7 +237,7 @@ public class ${helperclassname}  {
             stmt.setLong(i++,_${c['name']|lower}.getId());
             stmt.executeUpdate(sql);
             stmt.close();
-            c.commit();
+            connection.commit();
         } catch (SQLException e) {
 			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
 		}
@@ -257,7 +257,7 @@ public class ${helperclassname}  {
             stmt.setLong(1,_${c['name']|lower}.getId());
             stmt.executeUpdate(sql);
             stmt.close();
-            c.commit();
+            connection.commit();
         } catch (SQLException e) {
 			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
 		}

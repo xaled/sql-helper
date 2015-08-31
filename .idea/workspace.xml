@@ -4,7 +4,7 @@
     <list default="true" id="4992872e-12b9-4484-b641-add738fa4b6c" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/profiles/templates/sqlite_jdbc/helper.java.tmp" afterPath="$PROJECT_DIR$/profiles/templates/sqlite_jdbc/helper.java.tmp" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/profiles/templates/sqlite_jdbc/model.java.tmp" afterPath="$PROJECT_DIR$/profiles/templates/sqlite_jdbc/model.java.tmp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/profiles/sqlite_jdbc.py" afterPath="$PROJECT_DIR$/profiles/sqlite_jdbc.py" />
     </list>
     <ignored path="sql-helper.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -28,11 +28,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="helper.java.tmp" pinned="false" current-in-tab="true">
+      <file leaf-file-name="helper.java.tmp" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/profiles/templates/sqlite_jdbc/helper.java.tmp">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.6215596" vertical-offset="3014" max-vertical-offset="4140">
-              <caret line="219" column="17" selection-start-line="219" selection-start-column="17" selection-end-line="219" selection-end-column="17" />
+            <state vertical-scroll-proportion="-2.4117646" vertical-offset="3451" max-vertical-offset="4140">
+              <caret line="241" column="33" selection-start-line="241" selection-start-column="33" selection-end-line="241" selection-end-column="33" />
               <folding />
             </state>
           </provider>
@@ -48,11 +48,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="model.java.tmp" pinned="false" current-in-tab="false">
+      <file leaf-file-name="model.java.tmp" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/profiles/templates/sqlite_jdbc/model.java.tmp">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="225" max-vertical-offset="1170">
-              <caret line="13" column="9" selection-start-line="13" selection-start-column="9" selection-end-line="13" selection-end-column="9" />
+            <state vertical-scroll-proportion="0.51834863" vertical-offset="689" max-vertical-offset="1125">
+              <caret line="61" column="75" selection-start-line="61" selection-start-column="75" selection-end-line="61" selection-end-column="75" />
               <folding />
             </state>
           </provider>
@@ -61,11 +61,51 @@
       <file leaf-file-name="sqlite_jdbc.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/profiles/sqlite_jdbc.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-29.4" vertical-offset="180" max-vertical-offset="1485">
-              <caret line="61" column="9" selection-start-line="61" selection-start-column="9" selection-end-line="61" selection-end-column="9" />
+            <state vertical-scroll-proportion="-2.590164" vertical-offset="802" max-vertical-offset="1425">
+              <caret line="64" column="41" selection-start-line="64" selection-start-column="41" selection-end-line="64" selection-end-column="41" />
               <folding>
                 <element signature="e#21#30#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PrintfeedDatabaseHandler.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/output/com/printfeed/dbhelper/PrintfeedDatabaseHandler.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="5325">
+              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="FeedSource.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/output/com/printfeed/model/FeedSource.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1305">
+              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="FeedItem.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/output/com/printfeed/model/FeedItem.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-4.0277777" vertical-offset="95" max-vertical-offset="1845">
+              <caret line="16" column="23" selection-start-line="17" selection-start-column="22" selection-end-line="17" selection-end-column="23" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="sqlhelper.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/sqlhelper.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-6.6" vertical-offset="0" max-vertical-offset="420">
+              <caret line="14" column="39" selection-start-line="14" selection-start-column="39" selection-end-line="14" selection-end-column="39" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -88,8 +128,8 @@
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/profiles/filters/__init__.py" />
         <option value="$PROJECT_DIR$/profiles/sqlite_jdbc.py" />
-        <option value="$PROJECT_DIR$/profiles/templates/sqlite_jdbc/model.java.tmp" />
         <option value="$PROJECT_DIR$/profiles/templates/sqlite_jdbc/helper.java.tmp" />
+        <option value="$PROJECT_DIR$/profiles/templates/sqlite_jdbc/model.java.tmp" />
       </list>
     </option>
   </component>
@@ -186,11 +226,45 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="profiles" />
+              <option name="myItemId" value="output" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="filters" />
+              <option name="myItemId" value="com" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="printfeed" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="model" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sql-helper" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sql-helper" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="output" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="com" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="printfeed" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dbhelper" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -389,8 +463,8 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="24" width="1440" height="852" extended-state="7" />
-    <editor active="false" />
+    <frame x="0" y="24" width="1440" height="852" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
@@ -477,6 +551,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="45" max-vertical-offset="135">
           <caret line="3" column="0" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -501,6 +576,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="45" max-vertical-offset="135">
           <caret line="3" column="0" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -521,13 +597,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sqlhelper.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-8.4" vertical-offset="0" max-vertical-offset="465">
-          <caret line="14" column="39" selection-start-line="14" selection-start-column="39" selection-end-line="14" selection-end-column="39" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.86577183" vertical-offset="543" max-vertical-offset="1020">
@@ -539,6 +608,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.26845637" vertical-offset="0" max-vertical-offset="447">
           <caret line="8" column="14" selection-start-line="8" selection-start-column="4" selection-end-line="8" selection-end-column="14" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -571,28 +641,60 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/sqlhelper.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-6.6" vertical-offset="0" max-vertical-offset="420">
+          <caret line="14" column="39" selection-start-line="14" selection-start-column="39" selection-end-line="14" selection-end-column="39" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/profiles/sqlite_jdbc.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-29.4" vertical-offset="180" max-vertical-offset="1485">
-          <caret line="61" column="9" selection-start-line="61" selection-start-column="9" selection-end-line="61" selection-end-column="9" />
+        <state vertical-scroll-proportion="-2.590164" vertical-offset="802" max-vertical-offset="1425">
+          <caret line="64" column="41" selection-start-line="64" selection-start-column="41" selection-end-line="64" selection-end-column="41" />
           <folding>
             <element signature="e#21#30#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/profiles/templates/sqlite_jdbc/model.java.tmp">
+    <entry file="file://$PROJECT_DIR$/output/com/printfeed/dbhelper/PrintfeedDatabaseHandler.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1170">
-          <caret line="13" column="9" selection-start-line="13" selection-start-column="9" selection-end-line="13" selection-end-column="9" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="5325">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/output/com/printfeed/model/FeedSource.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1305">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/output/com/printfeed/model/FeedItem.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-4.0277777" vertical-offset="95" max-vertical-offset="1845">
+          <caret line="16" column="23" selection-start-line="17" selection-start-column="22" selection-end-line="17" selection-end-column="23" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/profiles/templates/sqlite_jdbc/helper.java.tmp">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.6215596" vertical-offset="3014" max-vertical-offset="4140">
-          <caret line="219" column="17" selection-start-line="219" selection-start-column="17" selection-end-line="219" selection-end-column="17" />
+        <state vertical-scroll-proportion="-2.4117646" vertical-offset="3451" max-vertical-offset="4140">
+          <caret line="241" column="33" selection-start-line="241" selection-start-column="33" selection-end-line="241" selection-end-column="33" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/profiles/templates/sqlite_jdbc/model.java.tmp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.51834863" vertical-offset="689" max-vertical-offset="1125">
+          <caret line="61" column="75" selection-start-line="61" selection-start-column="75" selection-end-line="61" selection-end-column="75" />
           <folding />
         </state>
       </provider>

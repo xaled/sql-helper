@@ -1,6 +1,7 @@
 __author__ = 'xaled'
 import os
 from mako.template import Template
+from .filters import upperFirst
 
 #TODO: make it oop!
 
@@ -60,34 +61,29 @@ def createHelperClasses(config):
         class_text = modelTemplate.render(**modeldata)
         #print "class: ", classname, "\n"
         #print class_text
-        """
-        os.system("mkdir -p '%s'"%(helper_dir))
-        class_file = os.path.join(helper_dir,class_name+".java")
+        os.system("mkdir -p '%s'"%(os.path.join("output",model_dir)))
+        class_file = os.path.join("output",os.path.join(model_dir,classname+".java"))
+        print "creating ", class_file
         fou = open(class_file,"w")
         fou.write(class_text)
         fou.close()
-        """
+
 
     # create helper file
     helperdata = {"dbname":db_name,"dbversion":db_version,"model_package":model_package, "helper_package":helper_package,"classes":classlist}
     helpertemplate = Template(filename=helperTemplateFile)
     helperclasstext = helpertemplate.render(**helperdata)
-    print "Helperclass: \n"
-    print helperclasstext
+    #print "Helperclass: \n"
+    #print helperclasstext
+    os.system("mkdir -p '%s'"%(os.path.join("output",helper_dir)))
+    helperclassname = upperFirst(db_name) + "DatabaseHandler"
+    class_file = os.path.join("output",os.path.join(helper_dir,helperclassname+".java"))
+    print "creating ", class_file
+    fou = open(class_file,"w")
+    fou.write(helperclasstext)
+    fou.close()
 
-    """
-    helpertemplate = Template(filename='helper.temp')
-    helper_classname = db_name[0].upper() + db_name[1:] + "DatabaseHandler"
-    classlist = list()
-    for c in classes:
-        cc = dict()
-        cc['name'] = c['name']
-        cc['nameup'] = c['name'].upper()
-        cc['namelow'] = c['name'].lower()
-        classlist.append(cc)
-    helper_text = helpertemplate.render(helper_package=helper_package, model_package=models_package, helper_classname=helper_classname,dbname=db_name,classes=classlist)
-    print helper_text
-    """
+
 
 
 
