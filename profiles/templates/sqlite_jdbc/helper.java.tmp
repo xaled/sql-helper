@@ -7,6 +7,28 @@ package ${helper_package};
             argline += '," + KEY_%s + " %s'%(upper(v['name']),v['stype'])
         argline += ' " + ")"'
         return argline
+
+
+    def getKeys(vars):
+        if len(vars) == 0: return ""
+        keys = lower(vars[0]['name'])
+        for v in vars[1:]:
+            keys += ", " + lower(v['name'])
+        return keys
+
+    def getPreparedVars(vars_num):
+        if vars_num == 0: return ""
+        line = "?"
+        for i in range(vars_num-1):
+            line += ", ?"
+        return line
+
+    def getUpdateKeys(vars):
+        if len(vars)==0: return ""
+        line = lower(vars[0]['name']) + " = ?"
+        for v in vars:
+            line += ", " + lower(v['name']) + " = ?"
+        return line
 %>
 <%
     helperclassname = upperFirst(dbname) + "DatabaseHandler"
@@ -23,7 +45,7 @@ import java.sql.*;
 public class ${helperclassname}  {
 
 	private static ${helperclassname} instance;
-    // All Static variables
+    // I- All private and static variables
     // Database Version
     private static final int DATABASE_VERSION = 1;
 
@@ -47,6 +69,7 @@ public class ${helperclassname}  {
 
     private Connection connection = null;
 
+    // II- Constructors
     public ${helperclassname}() {
         instance = this;
         connection = null;
@@ -65,7 +88,7 @@ public class ${helperclassname}  {
     	return instance;
     }
 
-    // Creating Tables
+    // III- Creating & updating Tables
     public void onCreate() {
 
 		try {
@@ -87,8 +110,9 @@ public class ${helperclassname}  {
     	try {
 	        // Drop older table if existed
 	    	Statement stmt = connection.createStatement();
-	    	stmt.executeUpdate("DROP TABLE IF EXISTS " + TABLE_FEEDITEMS);
-
+% for c in classes:
+	    	stmt.executeUpdate("DROP TABLE IF EXISTS " + TABLE_${c['name']|upper});
+% endfor
 	        // Create tables again
 	        onCreate();
 	        stmt.close();
@@ -98,450 +122,149 @@ public class ${helperclassname}  {
     }
 
     /**
-     * All CRUD(Create, Read, Update, Delete) Operations
+     * IV- All CRUD(Create, Read, Update, Delete) Operations
      */
 
-    // Adding new FeedItem
-    public void addFeedItem(FeedItem feedItem) {
-
+    // IV.1 Creating
+% for c in classes:
+    // Adding new ${c['name']}
+    public void add${c['name']|upperFirst}(${c['name']|upperFirst} _${c['name']|lower}) {
+        try {
+            String sql = "INSERT INTO "+TABLE_${c['name']|upper} +" (${getKeys(c['vars'])}) "+
+                         "VALUES (${getPreparedVars(len(c['vars']))});";
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            int i = 1;
+    % for v in c['vars']:
+            stmt.set${v['jtype']|upperFirst}(i++,_${c['name']|lower}.get${v['name']|upperFirst}());
+    % endfor
+            stmt.executeUpdate(sql);
+            stmt.close();
+            c.commit();
+        } catch (SQLException e) {
+			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+		}
     }
+% endfor
 
-    // Adding new FeedSource
-    public void addFeedSource(FeedSource feedsource){
+    // IV.2 Reading
+    // IV.2.1 Getting Single
+% for c in classes:
+    // Getting single ${c['name']}
+    public ${c['name']|upperFirst} get${c['name']|upperFirst}(long id) {
+        try{
 
-
+            String sql = "SELECT * FROM TABLE_${c['name']|upper} WHERE id=? LIMIT 1";
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setLong(1,id);
+            ResultSet rs = stmt.executeQuery();
+            if( rs.next() ) {
+                ${c['name']|upperFirst} ${c['name']|lower}_ = new ${c['name']|upperFirst}();
+                ${c['name']|lower}_.setId(rs.getLong("id"));
+    % for v in c['vars']:
+                ${c['name']|lower}_.set${v['name']|upperFirst}(rs.get${v['jtype']|upperFirst}("${v['name']|lower}"));
+    % endfor
+                return ${c['name']|lower}_;
+            }
+        } catch (SQLException e) {
+			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+		}
+		return null;
     }
+% endfor
 
-    // Getting single FeedItem
-    public FeedItem getFeedItem(int id) {
-        return null;
+
+
+    // IV.2.2 Getting All
+% for c in classes:
+    // Getting All ${c['name']}
+    public List<${c['name']|upperFirst}> getAll${c['name']|upperFirst}s() {
+        try{
+
+            String sql = "SELECT * FROM TABLE_${c['name']|upper}";
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            ArrayList<${c['name']|upperFirst}> list = newArray List<${c['name']|upperFirst}>();
+            while( rs.next() ) {
+                ${c['name']|upperFirst} ${c['name']|lower}_ = new ${c['name']|upperFirst}();
+                ${c['name']|lower}_.setId(rs.getLong("id"));
+    % for v in c['vars']:
+                ${c['name']|lower}_.set${v['name']|upperFirst}(rs.get${v['jtype']|upperFirst}("${v['name']|lower}"));
+    % endfor
+                list.add(${c['name']|lower}_);
+            }
+        } catch (SQLException e) {
+			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+			return null;
+		}
+		return list;
     }
+% endfor
 
-    // Getting All FeedItems
-    public List<FeedItem> getAllFeedItems() {
-        List<FeedItem> FeedItemsList = new ArrayList<FeedItem>();
+    //IV.2.3 TODO: special gets
 
-        return FeedItemsList;
+    //IV.2.4 Getting counts
+% for c in classes:
+    // Getting ${c['name']}s count
+    public int getAll${c['name']|upperFirst}sCount() {
+        try{
+
+            String sql = "SELECT COUNT(*) as countt FROM TABLE_${c['name']|upper}";
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            if( rs.next() ) {
+                return rs.getInt("countt");
+            }
+        } catch (SQLException e) {
+			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+		}
+		return -1;
     }
+% endfor
 
-    public List<FeedItem> getAllFeedItemsBySourceID(int srcId, Boolean seen){
-        List<FeedItem> FeedItemsList = new ArrayList<FeedItem>();
-
-        return FeedItemsList;
+    //IV.3 Updating
+    //IV.3.1 Updating single
+% for c in classes:
+    // Updating single ${c['name']}
+    public void update${c['name']|upperFirst}(${c['name']|upperFirst} _${c['name']|lower}) {
+        try {
+            String sql = "UPDATE "+TABLE_${c['name']|upper} +" SET ${getUpdateKeys(c['vars'])} "+
+                         "WHERE id=?";
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            int i = 1;
+    % for v in c['vars']:
+            stmt.set${v['jtype']|upperFirst}(i++,_${c['name']|lower}.get${v['name']|upperFirst}());
+    % endfor
+            stmt.setLong(i++,_${c['name']|lower}.getId());
+            stmt.executeUpdate(sql);
+            stmt.close();
+            c.commit();
+        } catch (SQLException e) {
+			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+		}
     }
+% endfor
+
+    //IV.3.2 TODO: Updating special
 
 
-
-    // Updating single rssItem
-    public int updateFeedItem(FeedItem feedItem) {
-    	return -1;
+    //IV.4 Deleting
+% for c in classes:
+    // Deleting single ${c['name']}
+    public void delete${c['name']|upperFirst}(${c['name']|upperFirst} _${c['name']|lower}) {
+        try {
+            String sql = "DELETE FROM "+TABLE_${c['name']|upper} + " WHERE id=?";
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setLong(1,_${c['name']|lower}.getId());
+            stmt.executeUpdate(sql);
+            stmt.close();
+            c.commit();
+        } catch (SQLException e) {
+			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+		}
     }
-    public int MarkFeedItemAsSeen(FeedItem feedItem) {
-    	return -1;
-    }
-
-    // Deleting single rssItem
-    public void deleteFeedItem(FeedItem feedItem) {
-
-    }
+% endfor
 
 
-    // Getting items Count
-    public int getFeedItemsCount() {
-
-        return 0;
-    }
-
-    public int getFeedItemsCount(int srcId, Boolean seen){
-    	return 0;
-
-    }
-
-    // Getting single source
-    FeedSource getFeedSource(int id) {
-
-        return null;
-    }
-
-    // Getting All Sources
-    public List<FeedSource> getAllFeedSources() {
-        List<FeedSource> sourceList = new ArrayList<FeedSource>();
-
-        return sourceList;
-    }
-
-    // Updating single source
-    public int updateFeedSource(FeedSource source) {
-       return -1;
-    }
-
-    // Deleting single source
-    public void deleteFeedSource(FeedSource source) {
-
-    }
 
 
-    // Getting sources Count
-    public int getFeedSourceCount() {
-        return 0;
-    }
 }
-
-/*
-import android.content.ContentValues;
-import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
-//import android.util.Log;
- *
-
-
-public class RssDBHandler extends SQLiteOpenHelper {
-
-	private static RssDBHandler instance;
-    // All Static variables
-    // Database Version
-    private static final int DATABASE_VERSION = 1;
-
-    // Database Name
-    private static final String DATABASE_NAME = "RSSmonster_DB";
-
-    // RSSItems table title
-    private static final String TABLE_RSSITEMS = "items";
-    private static final String TABLE_SOURCES = "sources";
-
-    // RSSItems Table Columns titles
-    private static final String KEY_ID = "id";
-    private static final String KEY_TITLE = "title";
-    private static final String KEY_LINK = "link";
-    private static final String KEY_DESC = "desc";
-    private static final String KEY_SRCID = "sourceID";
-    private static final String KEY_SEEN = "seen";
-    private static final String KEY_DATE = "date";
-
-    // Sources Table Columns titles
-    private static final String KEY_SRC_ID = "id";
-    private static final String KEY_SRC_NAME = "name";
-    private static final String KEY_SRC_URL = "sourceURL";
-    private static final String KEY_SRC_TAGS = "tags";
-
-    public RssDBHandler(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        instance = this;
-    }
-
-    public static RssDBHandler getInstance(){
-    	return instance;
-    }
-
-    // Creating Tables
-    @Override
-    public void onCreate(SQLiteDatabase db) {
-        String CREATE_RSSITEMS_TABLE = "CREATE TABLE " + TABLE_RSSITEMS + "("
-                + KEY_ID + " INTEGER PRIMARY KEY," + KEY_TITLE + " TEXT,"
-                + KEY_LINK + " TEXT NOT NULL UNIQUE, " + KEY_DESC + " TEXT, "
-                + KEY_SRCID + " INTEGER, " + KEY_SEEN + " INTEGER, " + KEY_DATE + " TEXT " + ")";
-        String CREATE_SOURCES_TABLE = "CREATE TABLE " + TABLE_SOURCES + "("
-                + KEY_SRC_ID + " INTEGER PRIMARY KEY," + KEY_SRC_NAME + " TEXT,"
-                + KEY_SRC_URL + " TEXT NOT NULL UNIQUE, " + KEY_SRC_TAGS + " TEXT " + ")";
-        db.execSQL(CREATE_RSSITEMS_TABLE);
-        db.execSQL(CREATE_SOURCES_TABLE);
-    }
-
-    // Upgrading database
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // Drop older table if existed
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_RSSITEMS);
-
-        // Create tables again
-        onCreate(db);
-    }
-
-    /**
-     * All CRUD(Create, Read, Update, Delete) Operations
-     */
-
-    // Adding new rssItem
-//    public void addRSSItem(RSSItem rssItem) {
-//        SQLiteDatabase db = this.getWritableDatabase();
-//
-//        ContentValues values = new ContentValues();
-//        values.put(KEY_TITLE, rssItem.getTitle()); // RSSItem Name
-//        values.put(KEY_LINK, rssItem.getLink()); // RSSItem URL
-//        values.put(KEY_DESC, rssItem.getDesc()); // RSSItem desc
-//        values.put(KEY_SRCID, rssItem.getSourceID()); // RSSItem sourceID
-////        values.put(KEY_SEEN, rssItem.getSeen());
-//        values.put(KEY_SEEN, 0);
-//        values.put(KEY_DATE, rssItem.getDate());
-//        // Inserting Row
-//        db.insert(TABLE_RSSITEMS, null, values);
-//        db.close(); // Closing database connection
-//    }
-//
-//    // Adding new source
-//    public void addSource(Source source){
-//    	SQLiteDatabase db = this.getWritableDatabase();
-//
-//    	ContentValues values = new ContentValues();
-//    	values.put(KEY_SRC_NAME, source.getName()); // Source Name
-//        values.put(KEY_SRC_URL, source.getSourceURL()); // Source URL
-//        values.put(KEY_SRC_TAGS, source.getTags()); // Source tags
-//
-//        // Inserting Row
-//        db.insert(TABLE_SOURCES, null, values);
-//        db.close(); // Closing database connection
-//
-//    }
-//
-//    // Getting esingle rssItem
-//    public RSSItem getRSSItem(int id) {
-//        SQLiteDatabase db = this.getReadableDatabase();
-//
-//        Cursor cursor = db.query(TABLE_RSSITEMS, new String[] { KEY_ID,
-//                KEY_TITLE, KEY_LINK, KEY_DESC, KEY_SRCID, KEY_SEEN, KEY_DATE }, KEY_ID + "=?",
-////        Cursor cursor = db.query(TABLE_RSSITEMS, new String[] { KEY_ID,
-////                KEY_TITLE, KEY_LINK }, KEY_ID + "=?",
-//
-//                new String[] { String.valueOf(id) }, null, null, null, null);
-//        if (cursor != null)
-//            cursor.moveToFirst();
-////        @SuppressWarnings("unused")
-////		String dbug = cursor.getString(3);
-//        RSSItem rssItem = new RSSItem(Integer.parseInt(cursor.getString(0)),
-//                cursor.getString(1), cursor.getString(2), cursor.getString(3)
-//                , Integer.parseInt(cursor.getString(4)), Integer.parseInt(cursor.getString(5)), cursor.getString(6));
-//        // return rssItem
-//        return rssItem;
-//    }
-//
-//    // Getting All RSSItems
-//    public List<RSSItem> getAllRSSItems() {
-//        List<RSSItem> rssItemList = new ArrayList<RSSItem>();
-//        // Select All Query
-//        String selectQuery = "SELECT  * FROM " + TABLE_RSSITEMS;
-//
-//        SQLiteDatabase db = this.getWritableDatabase();
-//        Cursor cursor = db.rawQuery(selectQuery, null);
-//
-//        // looping through all rows and adding to list
-//        if (cursor.moveToFirst()) {
-//            do {
-//                RSSItem rssItem = new RSSItem();
-//                rssItem.setID(Integer.parseInt(cursor.getString(0)));
-//                rssItem.setTitle(cursor.getString(1));
-//                rssItem.setLink(cursor.getString(2));
-////                Log.d("DESCR","test!!!!!!" + cursor.getString(2));
-//                rssItem.setDesc(cursor.getString(3));
-//                rssItem.setSourceID(Integer.parseInt(cursor.getString(4)));
-//                rssItem.setSeen(Integer.parseInt(cursor.getString(5)));
-//                rssItem.setDate(cursor.getString(6));
-//                // Adding rssItem to list
-//                rssItemList.add(rssItem);
-//            } while (cursor.moveToNext());
-//        }
-//
-//        // return rssItem list
-//        return rssItemList;
-//    }
-//    public List<RSSItem> getAllRSSItemsBySourceID(String sourceID){
-//    	List<RSSItem> items = new ArrayList<RSSItem>();
-//    	String selectQuery = "SELECT  * FROM " + TABLE_RSSITEMS
-//    			+ " itm WHERE itm." + KEY_SRCID + " = '" + sourceID + "'";
-//    	SQLiteDatabase db = this.getWritableDatabase();
-//        Cursor cursor = db.rawQuery(selectQuery, null);
-//
-//        // looping through all rows and adding to list
-//        if (cursor.moveToFirst()) {
-//            do {
-//                RSSItem rssItem = new RSSItem();
-//                rssItem.setID(Integer.parseInt(cursor.getString(0)));
-//                rssItem.setTitle(cursor.getString(1));
-//                rssItem.setLink(cursor.getString(2));
-////                Log.d("DESCR","test!!!!!!" + cursor.getString(2));
-//                rssItem.setDesc(cursor.getString(3));
-//                rssItem.setSourceID(Integer.parseInt(cursor.getString(4)));
-//                rssItem.setSeen(Integer.parseInt(cursor.getString(5)));
-//                rssItem.setDate(cursor.getString(6));
-//                // Adding rssItem to list
-//                items.add(rssItem);
-//            } while (cursor.moveToNext());
-//        }
-//    	return items;
-//    }
-//
-//    public List<RSSItem> getAllNotSeenRSSItemsBySourceID(String sourceID){
-//    	List<RSSItem> items = new ArrayList<RSSItem>();
-//    	String selectQuery = "SELECT * FROM " + TABLE_RSSITEMS
-//    				+ " itm WHERE itm." + KEY_SEEN + " = 1 AND itm."
-//    				+ KEY_SRCID + " = '" + sourceID + "'";
-//    	SQLiteDatabase db = this.getWritableDatabase();
-//        Cursor cursor = db.rawQuery(selectQuery, null);
-//        if (cursor.moveToFirst()) {
-//            do {
-//                RSSItem rssItem = new RSSItem();
-//                rssItem.setID(Integer.parseInt(cursor.getString(0)));
-//                rssItem.setTitle(cursor.getString(1));
-//                rssItem.setLink(cursor.getString(2));
-////                Log.d("DESCR","test!!!!!!" + cursor.getString(2));
-//                rssItem.setDesc(cursor.getString(3));
-//                rssItem.setSourceID(Integer.parseInt(cursor.getString(4)));
-//                rssItem.setSeen(Integer.parseInt(cursor.getString(5)));
-//                rssItem.setDate(cursor.getString(6));
-//                // Adding rssItem to list
-//                items.add(rssItem);
-//            } while (cursor.moveToNext());
-//        }
-//		return items;
-//
-//    }
-//
-//    // Updating single rssItem
-//    public int updateRSSItem(RSSItem rssItem) {
-//        SQLiteDatabase db = this.getWritableDatabase();
-//
-//        ContentValues values = new ContentValues();
-//        values.put(KEY_TITLE, rssItem.getTitle());
-//        values.put(KEY_LINK, rssItem.getLink());
-//        values.put(KEY_DESC, rssItem.getDesc());
-//        values.put(KEY_SRCID, rssItem.getSourceID());
-//        values.put(KEY_SEEN, rssItem.getSeen());
-//        values.put(KEY_DATE, rssItem.getDate());
-//        // updating row
-//        return db.update(TABLE_RSSITEMS, values, KEY_ID + " = ?",
-//                new String[] { String.valueOf(rssItem.getID()) });
-//    }
-//    public int MarkRSSItemAsSeen(RSSItem rssItem) {
-//        SQLiteDatabase db = this.getWritableDatabase();
-//
-//        ContentValues values = new ContentValues();
-//        values.put(KEY_TITLE, rssItem.getTitle());
-//        values.put(KEY_LINK, rssItem.getLink());
-//        values.put(KEY_DESC, rssItem.getDesc());
-//        values.put(KEY_SRCID, rssItem.getSourceID());
-//        values.put(KEY_SEEN, 1);
-//        values.put(KEY_DATE, rssItem.getDate());
-//        // updating row
-//        return db.update(TABLE_RSSITEMS, values, KEY_ID + " = ?",
-//                new String[] { String.valueOf(rssItem.getID()) });
-//    }
-//
-//    // Deleting single rssItem
-//    public void deleteRSSItem(RSSItem rssItem) {
-//        SQLiteDatabase db = this.getWritableDatabase();
-//        db.delete(TABLE_RSSITEMS, KEY_ID + " = ?",
-//                new String[] { String.valueOf(rssItem.getID()) });
-//        db.close();
-//    }
-//
-//
-//    // Getting items Count
-//    public int getRSSItemsCount() {
-//        String countQuery = "SELECT  * FROM " + TABLE_RSSITEMS;
-//        SQLiteDatabase db = this.getReadableDatabase();
-//        Cursor cursor = db.rawQuery(countQuery, null);
-//        cursor.close();
-//
-//        // return count
-//        return cursor.getCount();
-//    }
-//
-//    public int getFeedItemsCount(String srcID){
-//    	String countQuery = "SELECT  * FROM " + TABLE_RSSITEMS + " itm WHERE itm." + KEY_SRCID
-//    			+ " = '" + srcID + "'";
-//        SQLiteDatabase db = this.getReadableDatabase();
-//        Cursor cursor = db.rawQuery(countQuery, null);
-//        cursor.close();
-//
-//        // return count
-//        return cursor.getCount();
-//
-//    }
-//    public int getNotSeenFeedItemsCount(String srcID){
-//    	String countQuery = "SELECT  * FROM " + TABLE_RSSITEMS + " itm WHERE itm."
-//    			+ KEY_SRCID	+ " = '" + srcID + "' AND itm." + KEY_SEEN + " = 1";
-//        SQLiteDatabase db = this.getReadableDatabase();
-//        Cursor cursor = db.rawQuery(countQuery, null);
-//        cursor.close();
-//
-//        // return count
-//        return cursor.getCount();
-//    }
-// // Getting single source
-//    Source getSource(int id) {
-//        SQLiteDatabase db = this.getReadableDatabase();
-//
-//        Cursor cursor = db.query(TABLE_SOURCES, new String[] { KEY_SRC_ID,
-//                KEY_SRC_NAME, KEY_SRC_URL, KEY_SRC_TAGS }, KEY_SRC_ID + "=?",
-//                new String[] { String.valueOf(id) }, null, null, null, null);
-//        if (cursor != null)
-//            cursor.moveToFirst();
-//
-//        Source source = new Source(Integer.parseInt(cursor.getString(0)),
-//                cursor.getString(1), cursor.getString(2), cursor.getString(3));
-//        // return source
-//        return source;
-//    }
-//
-//    // Getting All Sources
-//    public List<Source> getAllSources() {
-//        List<Source> sourceList = new ArrayList<Source>();
-//        // Select All Query
-//        String selectQuery = "SELECT  * FROM " + TABLE_SOURCES;
-//
-//        SQLiteDatabase db = this.getWritableDatabase();
-//        Cursor cursor = db.rawQuery(selectQuery, null);
-//
-//        // looping through all rows and adding to list
-//        if (cursor.moveToFirst()) {
-//            do {
-//                Source source = new Source();
-//                source.setID(Integer.parseInt(cursor.getString(0)));
-//                source.setName(cursor.getString(1));
-//                source.setSourceURL(cursor.getString(2));
-//                source.setTags(cursor.getString(3));
-//                // Adding source to list
-//                sourceList.add(source);
-//            } while (cursor.moveToNext());
-//        }
-//
-//        // return source list
-//        return sourceList;
-//    }
-//
-//    // Updating single source
-//    public int updateSource(Source source) {
-//        SQLiteDatabase db = this.getWritableDatabase();
-//
-//        ContentValues values = new ContentValues();
-//        values.put(KEY_SRC_NAME, source.getName());
-//        values.put(KEY_SRC_URL, source.getSourceURL());
-//        values.put(KEY_SRC_TAGS, source.getTags());
-//
-//        // updating row
-//        return db.update(TABLE_SOURCES, values, KEY_SRC_ID + " = ?",
-//                new String[] { String.valueOf(source.getID()) });
-//    }
-//
-//    // Deleting single source
-//    public void deleteSource(Source source) {
-//        SQLiteDatabase db = this.getWritableDatabase();
-//        db.delete(TABLE_SOURCES, KEY_SRC_ID + " = ?",
-//                new String[] { String.valueOf(source.getID()) });
-//        db.close();
-//    }
-//
-//
-//    // Getting sources Count
-//    public int getSourcesCount() {
-//        String countQuery = "SELECT  * FROM " + TABLE_SOURCES;
-//        SQLiteDatabase db = this.getReadableDatabase();
-//        Cursor cursor = db.rawQuery(countQuery, null);
-//        cursor.close();
-//
-//        // return count
-//        return cursor.getCount();
-//    }
-//
-//}
