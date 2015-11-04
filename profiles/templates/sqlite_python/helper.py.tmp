@@ -1,0 +1,270 @@
+package ${helper_package};
+<%!
+    from profiles.filters import upper,upperFirst,lower
+    def createargs(vars):
+        argline = '"("+ KEY_ID + " INTEGER PRIMARY KEY'
+        for v in vars:
+            argline += '," + KEY_%s + " %s'%(upper(v['name']),v['stype'])
+        argline += ' " + ")"'
+        return argline
+
+
+    def getKeys(vars):
+        if len(vars) == 0: return ""
+        keys = lower(vars[0]['name'])
+        for v in vars[1:]:
+            keys += ", " + lower(v['name'])
+        return keys
+
+    def getPreparedVars(vars_num):
+        if vars_num == 0: return ""
+        line = "?"
+        for i in range(vars_num-1):
+            line += ", ?"
+        return line
+
+    def getUpdateKeys(vars):
+        if len(vars)==0: return ""
+        line = lower(vars[0]['name']) + " = ?"
+        for v in vars:
+            line += ", " + lower(v['name']) + " = ?"
+        return line
+%>
+<%
+    helperclassname = upperFirst(dbname) + "DatabaseHandler"
+%>
+
+
+import java.util.ArrayList;
+import java.util.List;
+
+import ${model_package}.*;
+import java.sql.*;
+
+
+public class ${helperclassname}  {
+
+	private static ${helperclassname} instance;
+    // I- All private and static variables
+    // Database Version
+    private static final int DATABASE_VERSION = 1;
+
+    // Database Name
+    private static final String DATABASE_NAME = "${dbname}";
+    private static final String DATABASE_PATH = "${dbname}.db";
+
+    // Database table title
+% for c in classes:
+    private static final String TABLE_${c['name']|upper} = "${c['name']|lower}";
+% endfor
+
+    private static final String KEY_ID = "id";
+% for c in classes:
+    // ${c['name']} Table Columns titles
+   % for v in c['vars']:
+    private static final String KEY_${v['name']|upper} = "${v['name']|lower}";
+   % endfor
+
+% endfor
+
+    private Connection connection = null;
+
+    // II- Constructors
+    public ${helperclassname}() {
+        instance = this;
+        connection = null;
+        try {
+          Class.forName("org.sqlite.JDBC");
+          connection = DriverManager.getConnection("jdbc:sqlite:"+DATABASE_PATH);
+          System.out.println("Opened database successfully");
+        } catch ( Exception e ) {
+          System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+
+        }
+
+    }
+
+    public static ${helperclassname} getInstance(){
+    	return instance;
+    }
+
+    // III- Creating & updating Tables
+    public void onCreate() {
+
+		try {
+			Statement stmt = connection.createStatement();
+% for c in classes:
+	        String CREATE_${c['name']|upper}_TABLE = "CREATE TABLE " + TABLE_${c['name']|upper} + ${createargs(c['vars'])};
+            stmt.executeUpdate(CREATE_${c['name']|upper}_TABLE);
+
+% endfor
+	        stmt.close();
+		} catch (SQLException e) {
+			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+		}
+    }
+
+    // Upgrading database
+
+    public void onUpgrade() {
+    	try {
+	        // Drop older table if existed
+	    	Statement stmt = connection.createStatement();
+% for c in classes:
+	    	stmt.executeUpdate("DROP TABLE IF EXISTS " + TABLE_${c['name']|upper});
+% endfor
+	        // Create tables again
+	        onCreate();
+	        stmt.close();
+    	} catch (SQLException e) {
+			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+		}
+    }
+
+    /**
+     * IV- All CRUD(Create, Read, Update, Delete) Operations
+     */
+
+    // IV.1 Creating
+% for c in classes:
+    // Adding new ${c['name']}
+    public void add${c['name']|upperFirst}(${c['name']|upperFirst} _${c['name']|lower}) {
+        try {
+            String sql = "INSERT INTO "+TABLE_${c['name']|upper} +" (${getKeys(c['vars'])}) "+
+                         "VALUES (${getPreparedVars(len(c['vars']))});";
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            int i = 1;
+    % for v in c['vars']:
+            stmt.set${v['jtype']|upperFirst}(i++,_${c['name']|lower}.get${v['name']|upperFirst}());
+    % endfor
+            stmt.executeUpdate(sql);
+            stmt.close();
+            connection.commit();
+        } catch (SQLException e) {
+			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+		}
+    }
+% endfor
+
+    // IV.2 Reading
+    // IV.2.1 Getting Single
+% for c in classes:
+    // Getting single ${c['name']}
+    public ${c['name']|upperFirst} get${c['name']|upperFirst}(long id) {
+        try{
+
+            String sql = "SELECT * FROM TABLE_${c['name']|upper} WHERE id=? LIMIT 1";
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setLong(1,id);
+            ResultSet rs = stmt.executeQuery();
+            if( rs.next() ) {
+                ${c['name']|upperFirst} ${c['name']|lower}_ = new ${c['name']|upperFirst}();
+                ${c['name']|lower}_.setId(rs.getLong("id"));
+    % for v in c['vars']:
+                ${c['name']|lower}_.set${v['name']|upperFirst}(rs.get${v['jtype']|upperFirst}("${v['name']|lower}"));
+    % endfor
+                return ${c['name']|lower}_;
+            }
+        } catch (SQLException e) {
+			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+		}
+		return null;
+    }
+% endfor
+
+
+
+    // IV.2.2 Getting All
+% for c in classes:
+    // Getting All ${c['name']}
+    public List<${c['name']|upperFirst}> getAll${c['name']|upperFirst}s() {
+        ArrayList<${c['name']|upperFirst}> list = new ArrayList<${c['name']|upperFirst}>();
+        try{
+
+            String sql = "SELECT * FROM TABLE_${c['name']|upper}";
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            while( rs.next() ) {
+                ${c['name']|upperFirst} ${c['name']|lower}_ = new ${c['name']|upperFirst}();
+                ${c['name']|lower}_.setId(rs.getLong("id"));
+    % for v in c['vars']:
+                ${c['name']|lower}_.set${v['name']|upperFirst}(rs.get${v['jtype']|upperFirst}("${v['name']|lower}"));
+    % endfor
+                list.add(${c['name']|lower}_);
+            }
+        } catch (SQLException e) {
+			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+			return null;
+		}
+		return list;
+    }
+% endfor
+
+    //IV.2.3 TODO: special gets
+
+    //IV.2.4 Getting counts
+% for c in classes:
+    // Getting ${c['name']}s count
+    public int getAll${c['name']|upperFirst}sCount() {
+        try{
+
+            String sql = "SELECT COUNT(*) as countt FROM TABLE_${c['name']|upper}";
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            if( rs.next() ) {
+                return rs.getInt("countt");
+            }
+        } catch (SQLException e) {
+			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+		}
+		return -1;
+    }
+% endfor
+
+    //IV.3 Updating
+    //IV.3.1 Updating single
+% for c in classes:
+    // Updating single ${c['name']}
+    public void update${c['name']|upperFirst}(${c['name']|upperFirst} _${c['name']|lower}) {
+        try {
+            String sql = "UPDATE "+TABLE_${c['name']|upper} +" SET ${getUpdateKeys(c['vars'])} "+
+                         "WHERE id=?";
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            int i = 1;
+    % for v in c['vars']:
+            stmt.set${v['jtype']|upperFirst}(i++,_${c['name']|lower}.get${v['name']|upperFirst}());
+    % endfor
+            stmt.setLong(i++,_${c['name']|lower}.getId());
+            stmt.executeUpdate(sql);
+            stmt.close();
+            connection.commit();
+        } catch (SQLException e) {
+			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+		}
+    }
+% endfor
+
+    //IV.3.2 TODO: Updating special
+
+
+    //IV.4 Deleting
+% for c in classes:
+    // Deleting single ${c['name']}
+    public void delete${c['name']|upperFirst}(${c['name']|upperFirst} _${c['name']|lower}) {
+        try {
+            String sql = "DELETE FROM "+TABLE_${c['name']|upper} + " WHERE id=?";
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setLong(1,_${c['name']|lower}.getId());
+            stmt.executeUpdate(sql);
+            stmt.close();
+            connection.commit();
+        } catch (SQLException e) {
+			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+		}
+    }
+% endfor
+
+
+
+
+}
