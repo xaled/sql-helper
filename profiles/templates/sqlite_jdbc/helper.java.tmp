@@ -57,7 +57,7 @@ public class ${helperclassname}  {
 % for c in classes:
     private static final String TABLE_${c['name']|upper} = "${c['name']|lower}";
 % endfor
-
+//TODO: fix same key name problem
     private static final String KEY_ID = "id";
 % for c in classes:
     // ${c['name']} Table Columns titles
@@ -201,6 +201,9 @@ public class ${helperclassname}  {
 % endfor
 
     //IV.2.3 TODO: special gets
+
+    //IV.2.3.bis TODO: get fetcher
+
 
     //IV.2.4 Getting counts
 % for c in classes:
